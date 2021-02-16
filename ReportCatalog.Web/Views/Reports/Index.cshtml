@@ -1,0 +1,118 @@
+﻿@model ReportCatalog.Web.Models.ReportViewModel
+
+@{
+    ViewData["Title"] = "Reports";
+    ViewData["PageTitle"] = "Reports";
+    ViewData["Location"] = "Reports";
+}
+
+<style>
+    .page-item.active .page-link {
+        z-index: 0;
+    }
+</style>
+<link href="~/css/zoom.css" rel="stylesheet" />
+
+<p>
+    <!-- Button trigger modal -->
+    <a type="button" asp-action="Create" class="btn btn-primary">
+        Add New
+    </a>
+    @*<a asp-action="Create" class="btn btn-primary">Add New</a>*@
+</p>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>
+                            @*@Html.DisplayNameFor(model => model.Name)*@
+                            Name
+                        </th>
+                        <th>
+                            Category
+                        </th>
+                        <th>
+                            Sub-Category
+                        </th>
+                        <th>
+                            Input image
+                        </th>
+                        <th>
+                            Output image
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Reports)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CategoryName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SubCategoryName)
+                            </td>
+                            <td>
+                                <img onclick="GetId('in_'+@item.Id.ToString())" id="in_@item.Id" src="~/images/@Html.DisplayFor(modelItem => item.InputImage)" class="rounded-circle image" height="100" width="100" alt="Image Not Available" />
+                            </td>
+                            <td>
+                                <img onclick="GetId('out_'+@item.Id.ToString())" id="out_@item.Id" src="~/images/@Html.DisplayFor(modelItem => item.OutputImage)" class="rounded-circle image" height="100" width="100" alt="Image Not Available" />
+                            </td>
+
+                            <td>
+                                @*<a class="btn btn-secondary btn-sm" onclick="EditData(@item.Id)"><span class="fas fa-edit"></span></a>*@
+                                <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@item.Id"><span class="fas fa-eye"></span></a>
+                                <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.Id" onclick="return confirm('Are sure wants to delete?');"><span class="fas fa-trash"></span></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Zoom Modal -->
+<div id="myModal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="img01">
+    <div id="caption"></div>
+</div>
+<!-- //Zoom Modal -->
+
+@section Scripts {
+    <script type="text/javascript">
+        function GetId(id) {
+            debugger;
+            console.id;
+            // Get the modal
+            var modal = document.getElementById("myModal");
+
+            // Get the image and insert it inside the modal - use its "alt" text as a caption
+            var img = document.getElementById(id);
+            var modalImg = document.getElementById("img01");
+            var captionText = document.getElementById("caption");
+            img.onclick = function () {
+                modal.style.display = "block";
+                modalImg.src = this.src;
+                //captionText.innerHTML = this.alt;
+            }
+
+            // Get the <span> element that closes the modal
+            var span = document.getElementsByClassName("close")[0];
+
+            // When the user clicks on <span> (x), close the modal
+            span.onclick = function () {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+}
+

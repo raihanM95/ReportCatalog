@@ -1,0 +1,58 @@
+﻿@model ReportCatalog.Web.Models.UserLogViewModel
+
+
+@{
+    ViewData["Title"] = "User Logs";
+    ViewData["PageTitle"] = "User Logs";
+    ViewData["Location"] = "User Logs";
+}
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>
+                            Username
+                        </th>
+                        <th>
+                            User Type
+                        </th>
+                        <th>
+                            Time
+                        </th>
+                        <th>
+                            Type
+                        </th>
+                        <th>
+                            IP
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.UserLogs)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Username)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.UserType)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Time)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Type)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.IP)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

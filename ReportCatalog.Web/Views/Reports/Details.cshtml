@@ -1,0 +1,128 @@
+﻿@model ReportCatalog.Domain.Entities.Report
+
+@{
+    ViewData["Title"] = "Report Details";
+    ViewData["PageTitle"] = "Report Details";
+    ViewData["Location"] = "Report Details";
+}
+
+<link href="~/css/zoom.css" rel="stylesheet" />
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>
+            Report name
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            Category
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CategoryName)
+        </dd>
+        <dt>
+            Sub-Category
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SubCategoryName)
+        </dd>
+        <dt>
+            Procedure name
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.StoredProcedureName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt>
+            Input image
+        </dt>
+        <dd>
+            <img id="inputImage" src="~/images/@Html.DisplayFor(model => model.InputImage)" class="image" height="100" width="100" />
+        </dd>
+        <dt>
+            Output image
+        </dt>
+        <dd>
+            <img id="outputImage" src="~/images/@Html.DisplayFor(model => model.OutputImage)" class="image" height="100" width="100" />
+        </dd>
+        <dt>
+            Created by
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CreatedBy)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Created)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Created)
+        </dd>
+        <dt>
+            Last modified by
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LastModifiedBy)
+        </dd>
+        <dt>
+            Last modified
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LastModified)
+        </dd>
+    </dl>
+</div>
+<div>
+    @*<a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |*@
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<!-- Zoom Modal -->
+<div id="myModal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="img01">
+    <div id="caption"></div>
+</div>
+<!-- //Zoom Modal -->
+
+@section Scripts {
+    <script type="text/javascript">
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the image and insert it inside the modal - use its "alt" text as a caption
+        var inputImage = document.getElementById("inputImage");
+        var modalImg = document.getElementById("img01");
+        var captionText = document.getElementById("caption");
+        inputImage.onclick = function () {
+            modal.style.display = "block";
+            modalImg.src = this.src;
+            //captionText.innerHTML = this.alt;
+        }
+
+        // Get the image and insert it inside the modal - use its "alt" text as a caption
+        var outputImage = document.getElementById("outputImage");
+        var modalImg = document.getElementById("img01");
+        var captionText = document.getElementById("caption");
+        outputImage.onclick = function () {
+            modal.style.display = "block";
+            modalImg.src = this.src;
+            //captionText.innerHTML = this.alt;
+        }
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+    </script>
+}
+

@@ -1,0 +1,231 @@
+﻿@model ReportCatalog.Web.Models.SubCategoryViewModel
+
+@{
+    ViewData["Title"] = "Sub-Categories";
+    ViewData["PageTitle"] = "Sub-Categories";
+    ViewData["Location"] = "Sub-Categories";
+}
+
+<p>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addSubCategory">
+        Add New
+    </button>
+    @*<a asp-action="Create" class="btn btn-primary">Add New</a>*@
+</p>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>
+                            @*@Html.DisplayNameFor(model => model.Name)*@
+                            Name
+                        </th>
+                        <th>
+                            Category name
+                        </th>
+                        <th>
+                            Created By
+                        </th>
+                        <th>
+                            Created
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.SubCategories)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CategoryName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CreatedBy)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Created)
+                            </td>
+                            @*<td>
+                                @Html.DisplayFor(modelItem => item.LastModifiedBy)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LastModified)
+                            </td>*@
+                            <td>
+                                <a class="btn btn-secondary btn-sm" onclick="EditData(@item.Id)"><span class="fas fa-edit"></span></a> 
+                                <a class="btn btn-info btn-sm" onclick="GetData(@item.Id)"><span class="fas fa-eye"></span></a> 
+                                <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.Id" onclick="return confirm('Are sure wants to delete?');"><span class="fas fa-trash"></span></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="addSubCategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">New Sub-Category</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label asp-for="Name">Name</label>
+                        <input type="text" asp-for="Name" class="form-control" placeholder="Enter sub-category name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CategoryId">Category name</label>
+                        <select asp-for="CategoryId" asp-items="ViewBag.Category" class="form-control"></select>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="button" value="Close" class="btn btn-secondary" data-dismiss="modal" />
+                    <input type="submit" value="Create" class="btn btn-success" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- //Create Modal -->
+<!-- Update Modal -->
+<div class="modal fade" id="updateSubCategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Update Sub-Category</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <input type="hidden" asp-for="Id" id="id" />
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label asp-for="Name">Name</label>
+                        <input type="text" asp-for="Name" class="form-control" placeholder="Enter sub-category name" id="name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="button" value="Close" class="btn btn-secondary" data-dismiss="modal" />
+                    <input type="submit" value="Update" class="btn btn-success" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- //Update Modal -->
+<!-- Details Modal -->
+<div class="modal fade" id="detailsSubCategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Details Sub-Category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <table class="table">
+
+                <tbody>
+                    <tr>
+                        <th>Name</th>
+                        <td id="dname"></td>
+                    </tr>
+                    <tr>
+                        <th>Category name</th>
+                        <td id="dcategoryName"></td>
+                    </tr>
+                    <tr>
+                        <th>Created By</th>
+                        <td id="dcreatedBy"></td>
+                    </tr>
+                    <tr>
+                        <th>Created</th>
+                        <td id="dcreated"></td>
+                    </tr>
+                    <tr>
+                        <th>Last Modified By</th>
+                        <td id="dlastModifiedBy"></td>
+                    </tr>
+                    <tr>
+                        <th>Last Modified</th>
+                        <td id="dlastModified"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="modal-footer">
+                <input type="button" value="Ok" class="btn btn-success" data-dismiss="modal" />
+            </div>
+        </div>
+    </div>
+</div>
+<!-- //Details Modal -->
+
+<script>
+    //Update
+    function EditData(id) {
+        $.ajax({
+            url: "/SubCategories/Edit/" + id,
+            typr: "GET",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "json",
+            success: function (response) {
+                debugger;
+                $('#id').val(response.id);
+                $('#name').val(response.name);
+
+                $('#updateSubCategory').modal('show');
+            },
+            error: function (response) {
+                alert(response.responseText);
+            }
+        });
+        return false;
+    }
+
+    //Details
+    function GetData(id) {
+        $.ajax({
+            url: "/SubCategories/Details/" + id,
+            typr: "GET",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "json",
+            success: function (response) {
+                debugger;
+
+                $('#dname').text(response.name);
+                $('#dcategoryName').text(response.categoryName);
+                $('#dcreatedBy').text(response.createdBy);
+                $('#dcreated').text(response.created);
+                $('#dlastModifiedBy').text(response.lastmodifiedby);
+                $('#dlastModified').text(response.lastModified);
+
+                $('#detailsSubCategory').modal('show');
+            },
+            error: function (response) {
+                alert(response.responseText);
+            }
+        });
+        return false;
+    }
+</script>
+

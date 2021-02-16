@@ -1,0 +1,57 @@
+﻿@model ReportCatalog.Web.Models.UserViewModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+<style>
+    .text-danger {
+        color: red;
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="card center-align rounded credentialCard">
+            <div class="card-content">
+                <div class="row">
+                    <div class="col s12 l5 m5">
+                        <img src="~/HomeTemp/img/register.svg"
+                             alt="registerimg"
+                             class="responsive-img register-img" />
+                    </div>
+                    <div class="col s12 l7 m7">
+                        <h5 class="center-align subTitle">
+                            Create account
+                        </h5>
+                        <form asp-action="Register" id="registrationForm">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="input-field col s12">
+                                <input id="username" class="validate" type="text" asp-for="Username" placeholder="Username" required />
+                                <label for="username">Username</label>
+                                <span asp-validation-for="Username" class="text-danger"></span>
+                            </div>
+                            <div class="input-field col s12">
+                                <input id="password" name="password" type="password" asp-for="Password" minlength="6" data-rule-password="true" class="validate" required />
+                                <label for="password">Password</label>
+                                <span class="helper-text" data-error="At least 6 characters" data-success="Valid"></span>
+                            </div>
+                            <div class="input-field col s12">
+                                <input id="confirmPassword" name="confirmPassword" type="password" data-rule-password="true" data-rule-equalTo="#password" class="validate" required />
+                                <label for="confirmPassword">Confirm Password</label>
+                                <span class="helper-text" data-error="Password not match" data-success="Password match"></span>
+                            </div>
+                            <div class="center-align">
+                                <button type="submit"
+                                        class="waves-effect btn blue darken-3 btnRounded">
+                                    Register
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

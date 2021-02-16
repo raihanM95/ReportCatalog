@@ -1,0 +1,99 @@
+﻿@model ReportCatalog.Web.Models.ReportViewModel
+
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Title"] = "Reports";
+    ViewData["PageTitle"] = "Reports";
+    ViewData["Location"] = "Reports";
+}
+
+<style>
+    .card{
+        margin: 2px;
+    }
+</style>
+
+<div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label>Category name</label>
+            <select asp-for="CategoryId" asp-items="ViewBag.Category" class="form-control" id="category">
+                <option selected disabled>Select</option>
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label>Sub-Category name</label>
+            <select asp-for="SubCategoryId" class="form-control" id="subCategory">
+                
+            </select>
+            <span asp-validation-for="SubCategoryId" class="text-danger"></span>
+        </div>
+    </div>
+
+</div>
+<div id="report">
+
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        //Load SubCategory
+        $("#category").on("change", function () {
+            var id = $("#category").val();
+            $.ajax({
+                url: "/SubCategories/SubCategory/" + id,
+                typr: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (response) {
+                    debugger;
+                    var s = '<option selected disabled>Select</option>';
+                    for (var i = 0; i < response.length; i++) {
+                        s += '<option value="' + response[i].id + '">' + response[i].name + '</option>';
+                    }
+                    $("#subCategory").html(s);
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+            return false;
+        });
+
+        //Load Reports
+        $("#subCategory").on("change", function () {
+            var id = $("#subCategory").val();
+            $.ajax({
+                url: "/Reports/SubCategoryWiseReports/" + id,
+                typr: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (response) {
+                    debugger;
+                    var s = '<div class="row">';
+
+                    for (var i = 0; i < response.length; i++) {
+                        //s += '<option value="' + response[i].id + '">' + response[i].name + '</option>';
+
+                        s += '<div class="card col-md-4" style="width: 18rem;">' +
+                                '<img src="/images/' + response[i].inputImage + '" style="height: 18rem;" class="card-img-top" alt="Image Not Available"/ >' +
+                                '<div class="card-body">'+
+                                    '<h5 class="card-title">' + response[i].name + '</h5>'+
+                                    //'<p class="card-text">' + response[i].description + '</p>'+
+                                    '<a href="/Reports/View/' + response[i].id +'" class="btn btn-primary">View Details</a>'+
+                                '</div>'+
+                             '</div> ';
+                    }
+
+                    s += '</div>';
+                    $("#report").html(s);
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+            return false;
+        });
+    </script>
+}
