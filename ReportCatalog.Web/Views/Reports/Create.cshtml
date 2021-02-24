@@ -6,75 +6,105 @@
     ViewData["Location"] = "New Report";
 }
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="CategoryId">Category name</label>
-                <select asp-for="CategoryId" asp-items="ViewBag.Category" class="form-control" id="category"></select>
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SubCategoryId">Sub-Category name</label>
-                <select asp-for="SubCategoryId" class="form-control" id="subCategory"></select>
-                <span asp-validation-for="SubCategoryId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Name">Name</label>
-                <input type="text" asp-for="Name" class="form-control" placeholder="Enter report name" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StoredProcedureName">Procedure name</label>
-                <textarea type="text" asp-for="StoredProcedureName" class="form-control"></textarea>
-                <span asp-validation-for="StoredProcedureName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description">Description</label>
-                <textarea type="text" asp-for="Description" class="form-control"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="InputImage" class="control-label">Input image</label>
-                <div class="custom-file">
-                    <input asp-for="InputImage" accept="image/*" class="custom-file-input" id="inputImage">
-                    <label class="custom-file-label" for="inputImage" id="inputImageLbl">Choose file</label>
-                </div>
-                <span asp-validation-for="InputImage" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="OutputImage" class="control-label">Output image</label>
-                <div class="custom-file">
-                    <input asp-for="OutputImage" accept="image/*" class="custom-file-input" id="outputImage">
-                    <label class="custom-file-label" for="outputImage" id="outputImageLbl">Choose file</label>
-                </div>
-                <span asp-validation-for="OutputImage" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-success" />
-            </div>
-        </form>
+<form asp-action="Create" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label asp-for="ProjectId">Project name</label>
+            <select asp-for="CategoryId" asp-items="ViewBag.Project" class="form-control" id="project"></select>
+            <span asp-validation-for="ProjectId" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-4">
+            <label asp-for="CategoryId">Category name</label>
+            <select asp-for="CategoryId" class="form-control" id="category"></select>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-4">
+            <label asp-for="SubCategoryId">Sub-Category name</label>
+            <select asp-for="SubCategoryId" class="form-control" id="subCategory"></select>
+            <span asp-validation-for="SubCategoryId" class="text-danger"></span>
+        </div>
     </div>
-</div>
-
+    <div class="form-group">
+        <label asp-for="Name">Name</label>
+        <input type="text" asp-for="Name" class="form-control" placeholder="Enter report name" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="FileName">File name</label>
+        <input type="text" asp-for="FileName" class="form-control" placeholder="Enter report file name" />
+        <span asp-validation-for="FileName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="StoredProcedureName">Procedure name</label>
+        <textarea type="text" asp-for="StoredProcedureName" class="form-control"></textarea>
+        <span asp-validation-for="StoredProcedureName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Description">Description</label>
+        <textarea type="text" asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label asp-for="InputImage" class="control-label">Input image</label>
+            <div class="custom-file">
+                <input asp-for="InputImage" accept="image/*" class="custom-file-input" id="inputImage">
+                <label class="custom-file-label" for="inputImage" id="inputImageLbl">Choose file</label>
+            </div>
+            <span asp-validation-for="InputImage" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="OutputImage" class="control-label">Output image</label>
+            <div class="custom-file">
+                <input asp-for="OutputImage" accept="image/*" class="custom-file-input" id="outputImage">
+                <label class="custom-file-label" for="outputImage" id="outputImageLbl">Choose file</label>
+            </div>
+            <span asp-validation-for="OutputImage" class="text-danger"></span>
+        </div>
+    </div>
+    <input type="submit" value="Create" class="btn btn-success" />
+</form>
+  
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
     <script type="text/javascript">
-        //Load SubCategory
-        $("#category").on("change", function () {
-            var id = $("#category").val();
+        //Load Category
+        $("#project").on("change", function () {
+            var id = $("#project").val();
             $.ajax({
-                url: "/SubCategories/SubCategory/" + id,
+                url: '@Url.Action("Category", "Categories")' + '/' + id,
                 typr: "GET",
                 contentType: "application/json;charset=UTF-8",
                 dataType: "json",
                 success: function (response) {
                     debugger;
-                    var s = null;
+                    var s = '<option selected disabled>Select</option>';
+                    for (var i = 0; i < response.length; i++) {
+                        s += '<option value="' + response[i].id + '">' + response[i].name + '</option>';
+                    }
+                    $("#category").html(s);
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+            return false;
+        });
+        //Load SubCategory
+        $("#category").on("change", function () {
+            var id = $("#category").val();
+            $.ajax({
+                url: '@Url.Action("SubCategory", "SubCategories")' + '/' + id,
+                typr: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (response) {
+                    debugger;
+                    var s = '<option selected disabled>Select</option>';
                     for (var i = 0; i < response.length; i++) {
                         s += '<option value="' + response[i].id + '">' + response[i].name + '</option>';
                     }

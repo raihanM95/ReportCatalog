@@ -1,0 +1,54 @@
+﻿@model ReportCatalog.Web.Models.UserViewModel
+
+
+@{
+    ViewData["Title"] = "Users";
+    ViewData["PageTitle"] = "Users";
+    ViewData["Location"] = "Users";
+}
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>
+                            Username
+                        </th>
+                        <th>
+                            User Type
+                        </th>
+                        <th>
+                            Created
+                        </th>
+                        <th>
+                            CreatedBy
+                        </th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Users)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Username)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.UserType)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Created)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CreatedBy)
+                            </td>
+                            
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

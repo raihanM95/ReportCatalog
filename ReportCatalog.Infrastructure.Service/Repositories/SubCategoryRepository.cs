@@ -45,7 +45,12 @@ namespace ReportCatalog.Infrastructure.Service.Repositories
 
         public async Task<IReadOnlyList<SubCategory>> GetAllAsync()
         {
-            var query = "SELECT sub.id, sub.name, sub.createdBy, sub.created, sub.lastModifiedBy, sub.lastModified, cat.id AS categoryId, cat.name AS categoryName FROM sub_categories AS sub INNER JOIN categories AS cat ON sub.categoryId = cat.id";
+            var query = @"SELECT sub.id, sub.name, sub.createdBy, sub.created, sub.lastModifiedBy, sub.lastModified, cat.id AS categoryId, cat.name AS categoryName, pro.id AS projectId, pro.name AS projectName 
+                          FROM sub_categories AS sub 
+                          INNER JOIN categories AS cat 
+                          ON sub.categoryId = cat.id 
+                          INNER JOIN projects AS pro 
+                          ON cat.projectId = pro.id";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultDBConnection")))
             {
                 connection.Open();
@@ -69,7 +74,12 @@ namespace ReportCatalog.Infrastructure.Service.Repositories
 
         public async Task<SubCategory> GetByIdAsync(int id)
         {
-            var query = "SELECT sub.id, sub.name, sub.createdBy, sub.created, sub.lastModifiedBy, sub.lastModified, cat.id AS categoryId, cat.name AS categoryName FROM sub_categories AS sub INNER JOIN categories AS cat ON sub.categoryId = cat.id WHERE sub.id = @Id";
+            var query = @"SELECT sub.id, sub.name, sub.createdBy, sub.created, sub.lastModifiedBy, sub.lastModified, cat.id AS categoryId, cat.name AS categoryName, pro.id AS projectId, pro.name AS projectName 
+                          FROM sub_categories AS sub 
+                          INNER JOIN categories AS cat 
+                          ON sub.categoryId = cat.id 
+                          INNER JOIN projects AS pro 
+                          ON cat.projectId = pro.id WHERE sub.id = @Id";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultDBConnection")))
             {
                 connection.Open();

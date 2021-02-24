@@ -12,6 +12,10 @@ namespace ReportCatalog.Domain.Entities
         public string Name { get; set; }
         [Required]
         public int CategoryId { get; set; }
+
         public string CategoryName { get; set; }
+        [Required]
+        public int ProjectId { get; set; }
+        public string ProjectName { get; set; }
     }
 }

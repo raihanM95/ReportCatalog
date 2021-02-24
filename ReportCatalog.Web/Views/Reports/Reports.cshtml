@@ -15,17 +15,22 @@
 
 <div>
     <div class="form-row">
-        <div class="form-group col-md-6">
-            <label>Category name</label>
-            <select asp-for="CategoryId" asp-items="ViewBag.Category" class="form-control" id="category">
+        <div class="form-group col-md-4">
+            <label>Project name</label>
+            <select asp-for="ProjectId" asp-items="ViewBag.Project" class="form-control" id="project">
                 <option selected disabled>Select</option>
+            </select>
+            <span asp-validation-for="ProjectId" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-4">
+            <label>Category name</label>
+            <select asp-for="CategoryId" class="form-control" id="category">
             </select>
             <span asp-validation-for="CategoryId" class="text-danger"></span>
         </div>
-        <div class="form-group col-md-6">
+        <div class="form-group col-md-4">
             <label>Sub-Category name</label>
             <select asp-for="SubCategoryId" class="form-control" id="subCategory">
-                
             </select>
             <span asp-validation-for="SubCategoryId" class="text-danger"></span>
         </div>
@@ -38,11 +43,34 @@
 
 @section Scripts {
     <script type="text/javascript">
+        //Load Category
+        $("#project").on("change", function () {
+            var id = $("#project").val();
+            $.ajax({
+                url: '@Url.Action("Category", "Categories")' + '/' + id,
+                typr: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (response) {
+                    debugger;
+                    var s = '<option selected disabled>Select</option>';
+                    for (var i = 0; i < response.length; i++) {
+                        s += '<option value="' + response[i].id + '">' + response[i].name + '</option>';
+                    }
+                    $("#category").html(s);
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+            return false;
+        });
+
         //Load SubCategory
         $("#category").on("change", function () {
             var id = $("#category").val();
             $.ajax({
-                url: "/SubCategories/SubCategory/" + id,
+                url: '@Url.Action("SubCategory", "SubCategories")' + '/' + id,
                 typr: "GET",
                 contentType: "application/json;charset=UTF-8",
                 dataType: "json",
@@ -65,7 +93,7 @@
         $("#subCategory").on("change", function () {
             var id = $("#subCategory").val();
             $.ajax({
-                url: "/Reports/SubCategoryWiseReports/" + id,
+                url: '@Url.Action("SubCategoryWiseReports", "Reports")' + '/' + id,
                 typr: "GET",
                 contentType: "application/json;charset=UTF-8",
                 dataType: "json",

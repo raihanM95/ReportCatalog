@@ -10,6 +10,7 @@ namespace ReportCatalog.Domain.Entities
     {
         [Required]
         public string Name { get; set; }
+        public string FileName { get; set; }
         public string StoredProcedureName { get; set; }
         public string Description { get; set; }
         [Required]
@@ -21,6 +22,10 @@ namespace ReportCatalog.Domain.Entities
         public string CategoryName { get; set; }
         [Required]
         public int SubCategoryId { get; set; }
+
         public string SubCategoryName { get; set; }
+        [Required]
+        public int ProjectId { get; set; }
+        public string ProjectName { get; set; }
     }
 }

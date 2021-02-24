@@ -7,16 +7,14 @@ using System.Threading.Tasks;
 
 namespace ReportCatalog.Web.Models
 {
-    public class CategoryViewModel
+    public class ProjectViewModel
     {
         public virtual int Id { get; set; }
         [Required]
         public string Name { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? Created { get; set; }
-        [Required]
-        public int ProjectId { get; set; }
 
-        public IEnumerable<Category> Categories { get; set; }
+        public IEnumerable<Project> Projects { get; set; }
     }
 }

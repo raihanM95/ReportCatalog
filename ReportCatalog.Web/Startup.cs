@@ -62,7 +62,7 @@ namespace ReportCatalog.Web
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-                    //pattern: "{controller=Reports}/{action=Reports}/{id?}");
+                    //pattern: "{controller=Home}/{action=Dashboard}/{id?}");
             });
         }
     }

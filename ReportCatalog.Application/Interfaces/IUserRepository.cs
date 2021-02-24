@@ -9,6 +9,7 @@ namespace ReportCatalog.Application.Interfaces
     public interface IUserRepository<User>
     {
         Task<User> GetByNameAsync(string userName);
+        Task<IReadOnlyList<User>> GetAllAsync();
         Task<int> RegisterUserAsync(User entity);
         Task<User> GetUserAsync(string userName, string password, string userType);
     }

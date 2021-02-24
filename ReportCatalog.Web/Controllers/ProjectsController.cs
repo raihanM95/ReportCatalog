@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using ReportCatalog.Application;
 using ReportCatalog.Domain.Entities;
 using ReportCatalog.Web.Models;
@@ -12,29 +10,26 @@ using System.Threading.Tasks;
 
 namespace ReportCatalog.Web.Controllers
 {
-    //[Authorize]
-    public class CategoriesController : Controller
+    public class ProjectsController : Controller
     {
         private readonly IRepositoryWrapper _repository;
 
-        public CategoriesController(IRepositoryWrapper repository)
+        public ProjectsController(IRepositoryWrapper repository)
         {
             _repository = repository;
         }
 
-        // GET: Categories
+        // GET: Projects
         public async Task<IActionResult> Index()
         {
             if (HttpContext.Session.GetString("Admin") != null)
             {
-                var categories = new CategoryViewModel
+                var projects = new ProjectViewModel
                 {
-                    Categories = await _repository.Categories.GetAllAsync()
+                    Projects = await _repository.Projects.GetAllAsync()
                 };
 
-                ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
-
-                return View(categories);
+                return View(projects);
             }
             else
             {
@@ -42,7 +37,7 @@ namespace ReportCatalog.Web.Controllers
             }
         }
 
-        //GET: Categories/Details/5
+        //GET: Projects/Details/5
         public async Task<IActionResult> Details(int id)
         {
             if (HttpContext.Session.GetString("Admin") != null)
@@ -52,13 +47,13 @@ namespace ReportCatalog.Web.Controllers
                     return NotFound();
                 }
 
-                var category = await _repository.Categories.GetByIdAsync(id);
-                if (category == null)
+                var project = await _repository.Projects.GetByIdAsync(id);
+                if (project == null)
                 {
                     return NotFound();
                 }
 
-                return Json(category);
+                return Json(project);
             }
             else
             {
@@ -66,7 +61,7 @@ namespace ReportCatalog.Web.Controllers
             }
         }
 
-        // GET: Categories/Create
+        // GET: Projects/Create
         public IActionResult Create()
         {
             if (HttpContext.Session.GetString("Admin") != null)
@@ -79,28 +74,26 @@ namespace ReportCatalog.Web.Controllers
             }
         }
 
-        // POST: Categories/Create
+        // POST: Projects/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,ProjectId,Id")] CategoryViewModel model)
+        public async Task<IActionResult> Create([Bind("Name,Id")] ProjectViewModel model)
         {
             if (HttpContext.Session.GetString("Admin") != null)
             {
-                if (ModelState.IsValid && !CategoryExists(model.Name))
+                if (ModelState.IsValid && !ProjectExists(model.Name))
                 {
-                    var category = new Category
+                    var project = new Project
                     {
                         Name = model.Name,
-                        ProjectId = model.ProjectId,
                         CreatedBy = HttpContext.Session.GetString("Admin"),
                         Created = DateTime.Now
                     };
 
-                    await _repository.Categories.AddAsync(category);
+                    await _repository.Projects.AddAsync(project);
                     return RedirectToAction(nameof(Index));
                 }
 
-                ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
                 ModelState.AddModelError("Name", "Name already exists!");
 
                 //Thread.Sleep(10000);
@@ -112,7 +105,7 @@ namespace ReportCatalog.Web.Controllers
             }
         }
 
-        // GET: Categories/Edit/5
+        // GET: Projects/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             if (HttpContext.Session.GetString("Admin") != null)
@@ -122,13 +115,13 @@ namespace ReportCatalog.Web.Controllers
                     return NotFound();
                 }
 
-                var category = await _repository.Categories.GetByIdAsync(id);
-                if (category == null)
+                var project = await _repository.Projects.GetByIdAsync(id);
+                if (project == null)
                 {
                     return NotFound();
                 }
-                //return View(category);
-                return Json(category);
+                
+                return Json(project);
             }
             else
             {
@@ -136,10 +129,10 @@ namespace ReportCatalog.Web.Controllers
             }
         }
 
-        // POST: Categories/Edit/5
+        // POST: Projects/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Name,Id")] CategoryViewModel model)
+        public async Task<IActionResult> Edit(int id, [Bind("Name,Id")] ProjectViewModel model)
         {
             if (HttpContext.Session.GetString("Admin") != null)
             {
@@ -152,18 +145,18 @@ namespace ReportCatalog.Web.Controllers
                 {
                     try
                     {
-                        var category = new Category
+                        var project = new Project
                         {
                             Id = model.Id,
                             Name = model.Name,
                             LastModifiedBy = HttpContext.Session.GetString("Admin"),
                             LastModified = DateTime.Now
                         };
-                        await _repository.Categories.UpdateAsync(category);
+                        await _repository.Projects.UpdateAsync(project);
                     }
                     catch (Exception ex)
                     {
-                        if (!CategoryExists(model.Id))
+                        if (!ProjectExists(model.Id))
                         {
                             return NotFound();
                         }
@@ -182,12 +175,12 @@ namespace ReportCatalog.Web.Controllers
             }
         }
 
-        // POST: Categories/Delete/
+        // POST: Projects/Delete/
         public async Task<IActionResult> Delete(int id)
         {
             if (HttpContext.Session.GetString("Admin") != null)
             {
-                var category = await _repository.Categories.DeleteAsync(id);
+                var category = await _repository.Projects.DeleteAsync(id);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -197,26 +190,19 @@ namespace ReportCatalog.Web.Controllers
             }
         }
 
-        // GET: Categories/Category
-        public async Task<IActionResult> Category(int id)
+        private bool ProjectExists(int id)
         {
-            var categories = await _repository.Categories.GetByProjectIdAsync(id);
-            return Json(categories);
-        }
-
-        private bool CategoryExists(int id)
-        {
-            var category = _repository.Categories.GetByIdAsync(id);
-            if (category.Result != null)
+            var project = _repository.Projects.GetByIdAsync(id);
+            if (project.Result != null)
                 return true;
             else
                 return false;
         }
 
-        private bool CategoryExists(string name)
+        private bool ProjectExists(string name)
         {
-            var category = _repository.Categories.GetByNameAsync(name);
-            if (category.Result != null)
+            var project = _repository.Projects.GetByNameAsync(name);
+            if (project.Result != null)
                 return true;
             else
                 return false;

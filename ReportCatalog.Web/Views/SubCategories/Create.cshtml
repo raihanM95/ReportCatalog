@@ -11,14 +11,19 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <label asp-for="ProjectId">Project name</label>
+                <select asp-for="ProjectId" asp-items="ViewBag.Project" class="form-control" id="project"></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="CategoryId">Category name</label>
-                <select asp-for="CategoryId" asp-items="ViewBag.Category" class="form-control"></select>
+                <select asp-for="CategoryId" class="form-control" id="category"></select>
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-success" />
@@ -30,4 +35,31 @@
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+
+@section Scripts {
+    <script type="text/javascript">
+        //Load Category
+        $("#project").on("change", function () {
+            var id = $("#project").val();
+            $.ajax({
+                url: '@Url.Action("Category", "Categories")' + '/' + id,
+                typr: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (response) {
+                    debugger;
+                    var s = '<option selected disabled>Select</option>';
+                    for (var i = 0; i < response.length; i++) {
+                        s += '<option value="' + response[i].id + '">' + response[i].name + '</option>';
+                    }
+                    $("#category").html(s);
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+            return false;
+        });
+    </script>
+}
 

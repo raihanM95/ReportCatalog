@@ -6,13 +6,9 @@ using System.Text;
 
 namespace ReportCatalog.Domain.Entities
 {
-    public class Category : AuditableBaseEntity
+    public class Project : AuditableBaseEntity
     {
         [Required]
         public string Name { get; set; }
-        [Required]
-        public int ProjectId { get; set; }
-
-        public string ProjectName { get; set; }
     }
 }

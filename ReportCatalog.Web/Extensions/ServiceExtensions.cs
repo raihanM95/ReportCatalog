@@ -19,6 +19,7 @@ namespace ReportCatalog.Web.Extensions
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
             services.AddScoped<IUserRepository<User>, UserRepository>();
             services.AddScoped<IUserLogRepository<UserLog>, UserLogRepository>();
+            services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
             services.AddScoped<IReportRepository, ReportRepository>();

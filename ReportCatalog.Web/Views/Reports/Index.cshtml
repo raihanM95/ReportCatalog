@@ -32,6 +32,9 @@
                             Name
                         </th>
                         <th>
+                            Project
+                        </th>
+                        <th>
                             Category
                         </th>
                         <th>
@@ -52,6 +55,9 @@
                         <tr>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ProjectName)
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.CategoryName)

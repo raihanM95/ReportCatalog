@@ -13,12 +13,15 @@ namespace ReportCatalog.Web.Models
         public virtual int Id { get; set; }
         [Required]
         public string Name { get; set; }
+        public string FileName { get; set; }
         public string StoredProcedureName { get; set; }
         public string Description { get; set; }
         [Required(ErrorMessage = "Please choose input image")]
         public IFormFile InputImage { get; set; }
         [Required(ErrorMessage = "Please choose output image")]
         public IFormFile OutputImage { get; set; }
+        [Required]
+        public int ProjectId { get; set; }
         [Required]
         public int CategoryId { get; set; }
         [Required]

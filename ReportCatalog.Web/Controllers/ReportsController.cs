@@ -29,7 +29,7 @@ namespace ReportCatalog.Web.Controllers
         {
             if (HttpContext.Session.GetString("User") != null)
             {
-                ViewData["Category"] = new SelectList(await _repository.Categories.GetAllAsync(), "Id", "Name");
+                ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
                 return View();
             }
             else
@@ -118,7 +118,7 @@ namespace ReportCatalog.Web.Controllers
         {
             if (HttpContext.Session.GetString("Admin") != null)
             {
-                ViewData["Category"] = new SelectList(await _repository.Categories.GetAllAsync(), "Id", "Name");
+                ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
                 return View();
             }
             else
@@ -130,7 +130,7 @@ namespace ReportCatalog.Web.Controllers
         // POST: Reports/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description,InputImage,OutputImage,SubCategoryId,Id")] ReportViewModel model)
+        public async Task<IActionResult> Create([Bind("Name,FileName,Description,InputImage,OutputImage,SubCategoryId,Id")] ReportViewModel model)
         {
             if (HttpContext.Session.GetString("Admin") != null)
             {
@@ -139,15 +139,16 @@ namespace ReportCatalog.Web.Controllers
                     var report = new Report
                     {
                         Name = model.Name,
+                        FileName = model.FileName,
                         Description = model.Description,
                         InputImage = InputImageUploadedFile(model),
                         OutputImage = OutputImageUploadedFile(model),
                         SubCategoryId = model.SubCategoryId,
-                        CreatedBy = HttpContext.Session.GetString("User"),
+                        CreatedBy = HttpContext.Session.GetString("Admin"),
                         Created = DateTime.Now
                     };
 
-                    ViewData["Category"] = new SelectList(await _repository.Categories.GetAllAsync(), "Id", "Name");
+                    ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
 
                     await _repository.Reports.AddAsync(report);
                     return RedirectToAction(nameof(Index));

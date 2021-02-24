@@ -30,7 +30,7 @@ namespace ReportCatalog.Web.Controllers
                     SubCategories = await _repository.SubCategories.GetAllAsync()
                 };
 
-                ViewData["Category"] = new SelectList(await _repository.Categories.GetAllAsync(), "Id", "Name");
+                ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
 
                 return View(subCategories);
             }
@@ -90,7 +90,7 @@ namespace ReportCatalog.Web.Controllers
                     {
                         Name = model.Name,
                         CategoryId = model.CategoryId,
-                        CreatedBy = HttpContext.Session.GetString("User"),
+                        CreatedBy = HttpContext.Session.GetString("Admin"),
                         Created = DateTime.Now
                     };
 
@@ -98,7 +98,7 @@ namespace ReportCatalog.Web.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                ViewData["Category"] = new SelectList(await _repository.Categories.GetAllAsync(), "Id", "Name");
+                ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
                 ModelState.AddModelError("Name", "Name already exists!");
 
                 //Thread.Sleep(10000);
@@ -154,7 +154,7 @@ namespace ReportCatalog.Web.Controllers
                         {
                             Id = model.Id,
                             Name = model.Name,
-                            LastModifiedBy = HttpContext.Session.GetString("User"),
+                            LastModifiedBy = HttpContext.Session.GetString("Admin"),
                             LastModified = DateTime.Now
                         };
                         await _repository.SubCategories.UpdateAsync(subCategory);
@@ -195,6 +195,13 @@ namespace ReportCatalog.Web.Controllers
             }
         }
 
+        // GET: SubCategories/SubCategory
+        public async Task<IActionResult> SubCategory(int id)
+        {
+            var subCategories = await _repository.SubCategories.GetByCategoryIdAsync(id);
+            return Json(subCategories);
+        }
+
         private bool SubCategoryExists(int id)
         {
             var subCategory = _repository.SubCategories.GetByIdAsync(id);
@@ -202,13 +209,6 @@ namespace ReportCatalog.Web.Controllers
                 return true;
             else
                 return false;
-        }
-
-        // GET: SubCategories/SubCategory
-        public async Task<IActionResult> SubCategory(int id)
-        {
-            var subCategories = await _repository.SubCategories.GetByCategoryIdAsync(id);
-            return Json(subCategories);
         }
 
         private bool SubCategoryExists(string name)

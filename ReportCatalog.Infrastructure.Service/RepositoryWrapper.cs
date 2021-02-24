@@ -12,6 +12,7 @@ namespace ReportCatalog.Infrastructure.Service
     {
         public IUserRepository<User> Users { get; }
         public IUserLogRepository<UserLog> UserLogs { get; }
+        public IProjectRepository Projects { get; }
         public ICategoryRepository Categories { get; }
         public ISubCategoryRepository SubCategories { get; }
         public IReportRepository Reports { get; }
@@ -19,12 +20,14 @@ namespace ReportCatalog.Infrastructure.Service
         public RepositoryWrapper(
             IUserRepository<User> users,
             IUserLogRepository<UserLog> userLog,
+            IProjectRepository projects,
             ICategoryRepository categories,
             ISubCategoryRepository subCategories,
             IReportRepository reports)
         {
             Users = users;
             UserLogs = userLog;
+            Projects = projects;
             Categories = categories;
             SubCategories = subCategories;
             Reports = reports;

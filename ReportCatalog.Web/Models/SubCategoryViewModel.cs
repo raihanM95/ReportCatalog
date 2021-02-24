@@ -15,6 +15,8 @@ namespace ReportCatalog.Web.Models
         public string CreatedBy { get; set; }
         public DateTime? Created { get; set; }
         [Required]
+        public int ProjectId { get; set; }
+        [Required]
         public int CategoryId { get; set; }
 
         public IEnumerable<SubCategory> SubCategories { get; set; }

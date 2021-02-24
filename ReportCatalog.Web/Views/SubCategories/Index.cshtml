@@ -25,6 +25,9 @@
                             Name
                         </th>
                         <th>
+                            Project name
+                        </th>
+                        <th>
                             Category name
                         </th>
                         <th>
@@ -44,6 +47,9 @@
                                 @Html.DisplayFor(modelItem => item.Name)
                             </td>
                             <td>
+                                @Html.DisplayFor(modelItem => item.ProjectName)
+                            </td>
+                            <td>
                                 @Html.DisplayFor(modelItem => item.CategoryName)
                             </td>
                             <td>
@@ -53,14 +59,14 @@
                                 @Html.DisplayFor(modelItem => item.Created)
                             </td>
                             @*<td>
-                                @Html.DisplayFor(modelItem => item.LastModifiedBy)
-                            </td>
+                                    @Html.DisplayFor(modelItem => item.LastModifiedBy)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.LastModified)
+                                </td>*@
                             <td>
-                                @Html.DisplayFor(modelItem => item.LastModified)
-                            </td>*@
-                            <td>
-                                <a class="btn btn-secondary btn-sm" onclick="EditData(@item.Id)"><span class="fas fa-edit"></span></a> 
-                                <a class="btn btn-info btn-sm" onclick="GetData(@item.Id)"><span class="fas fa-eye"></span></a> 
+                                <a class="btn btn-secondary btn-sm" onclick="EditData(@item.Id)"><span class="fas fa-edit"></span></a>
+                                <a class="btn btn-info btn-sm" onclick="GetData(@item.Id)"><span class="fas fa-eye"></span></a>
                                 <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.Id" onclick="return confirm('Are sure wants to delete?');"><span class="fas fa-trash"></span></a>
                             </td>
                         </tr>
@@ -85,14 +91,19 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label asp-for="Name">Name</label>
-                        <input type="text" asp-for="Name" class="form-control" placeholder="Enter sub-category name" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <label asp-for="ProjectId">Project name</label>
+                        <select asp-for="ProjectId" asp-items="ViewBag.Project" class="form-control" id="project"></select>
+                        <span asp-validation-for="ProjectId" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="CategoryId">Category name</label>
-                        <select asp-for="CategoryId" asp-items="ViewBag.Category" class="form-control"></select>
+                        <select asp-for="CategoryId" class="form-control" id="category"></select>
                         <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Name">Name</label>
+                        <input type="text" asp-for="Name" class="form-control" placeholder="Enter sub-category name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -151,6 +162,10 @@
                         <td id="dname"></td>
                     </tr>
                     <tr>
+                        <th>Project name</th>
+                        <td id="dprojectName"></td>
+                    </tr>
+                    <tr>
                         <th>Category name</th>
                         <td id="dcategoryName"></td>
                     </tr>
@@ -180,52 +195,80 @@
 </div>
 <!-- //Details Modal -->
 
-<script>
-    //Update
-    function EditData(id) {
-        $.ajax({
-            url: "/SubCategories/Edit/" + id,
-            typr: "GET",
-            contentType: "application/json;charset=UTF-8",
-            dataType: "json",
-            success: function (response) {
-                debugger;
-                $('#id').val(response.id);
-                $('#name').val(response.name);
-
-                $('#updateSubCategory').modal('show');
-            },
-            error: function (response) {
-                alert(response.responseText);
-            }
+@section Scripts {
+    <script type="text/javascript">
+        //Load Category
+        $("#project").on("change", function () {
+            var id = $("#project").val();
+            $.ajax({
+                url: '@Url.Action("Category", "Categories")' + '/' + id,
+                typr: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (response) {
+                    debugger;
+                    var s = '<option selected disabled>Select</option>';
+                    for (var i = 0; i < response.length; i++) {
+                        s += '<option value="' + response[i].id + '">' + response[i].name + '</option>';
+                    }
+                    $("#category").html(s);
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+            return false;
         });
-        return false;
-    }
 
-    //Details
-    function GetData(id) {
-        $.ajax({
-            url: "/SubCategories/Details/" + id,
-            typr: "GET",
-            contentType: "application/json;charset=UTF-8",
-            dataType: "json",
-            success: function (response) {
-                debugger;
+        //Update
+        function EditData(id) {
+            $.ajax({
+                url: '@Url.Action("Edit", "SubCategories")' + '/' + id,
+                typr: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (response) {
+                    debugger;
+                    $('#id').val(response.id);
+                    $('#name').val(response.name);
 
-                $('#dname').text(response.name);
-                $('#dcategoryName').text(response.categoryName);
-                $('#dcreatedBy').text(response.createdBy);
-                $('#dcreated').text(response.created);
-                $('#dlastModifiedBy').text(response.lastmodifiedby);
-                $('#dlastModified').text(response.lastModified);
+                    $('#updateSubCategory').modal('show');
+                },
+                error: function (response) {
+                    //alert(response.responseText);
+                    $('#updateSubCategory').modal('show');
+                }
+            });
+            return false;
+        }
 
-                $('#detailsSubCategory').modal('show');
-            },
-            error: function (response) {
-                alert(response.responseText);
-            }
-        });
-        return false;
-    }
-</script>
+        //Details
+        function GetData(id) {
+            $.ajax({
+                url: '@Url.Action("Details", "SubCategories")' + '/' + id,
+                typr: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (response) {
+                    debugger;
+
+                    $('#dname').text(response.name);
+                    $('#dprojectName').text(response.projectName);
+                    $('#dcategoryName').text(response.categoryName);
+                    $('#dcreatedBy').text(response.createdBy);
+                    $('#dcreated').text(response.created);
+                    $('#dlastModifiedBy').text(response.lastModifiedBy);
+                    $('#dlastModified').text(response.lastModified);
+
+                    $('#detailsSubCategory').modal('show');
+                },
+                error: function (response) {
+                    //alert(response.responseText);
+                    $('#detailsSubCategory').modal('show');
+                }
+            });
+            return false;
+        }
+    </script>
+}
 

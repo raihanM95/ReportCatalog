@@ -1,14 +1,14 @@
-﻿@model ReportCatalog.Web.Models.CategoryViewModel
+﻿@model ReportCatalog.Web.Models.ProjectViewModel
 
 @{
-    ViewData["Title"] = "Categories";
-    ViewData["PageTitle"] = "Categories";
-    ViewData["Location"] = "Categories";
+    ViewData["Title"] = "Projects";
+    ViewData["PageTitle"] = "Projects";
+    ViewData["Location"] = "Projects";
 }
 
 <p>
     <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCategory">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addProject">
         Add New
     </button>
     @*<a asp-action="Create" class="btn btn-primary">Add New</a>*@
@@ -25,9 +25,6 @@
                             Name
                         </th>
                         <th>
-                            Project name
-                        </th>
-                        <th>
                             Created By
                         </th>
                         <th>
@@ -37,14 +34,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.Categories)
+                    @foreach (var item in Model.Projects)
                     {
                         <tr>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.ProjectName)
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.CreatedBy)
@@ -72,26 +66,21 @@
 </div>
 
 <!-- Create Modal -->
-<div class="modal fade" id="addCategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="addProject" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form asp-action="Create">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">New Category</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">New Project</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label asp-for="ProjectId">Category name</label>
-                        <select asp-for="ProjectId" asp-items="ViewBag.Project" class="form-control"></select>
-                        <span asp-validation-for="ProjectId" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
                         <label asp-for="Name">Name</label>
-                        <input type="text" asp-for="Name" class="form-control" placeholder="Enter category name" />
+                        <input type="text" asp-for="Name" class="form-control" placeholder="Enter project name" />
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
@@ -105,13 +94,13 @@
 </div>
 <!-- //Create Modal -->
 <!-- Update Modal -->
-<div class="modal fade" id="updateCategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="updateProject" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form asp-action="Edit">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Update Category</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Update Project</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -120,7 +109,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label asp-for="Name">Name</label>
-                        <input type="text" asp-for="Name" class="form-control" placeholder="Enter category name" id="name" />
+                        <input type="text" asp-for="Name" class="form-control" placeholder="Enter project name" id="name" />
                         <span asp-validation-for="Name" class="text-danger"></span>
 
                     </div>
@@ -135,11 +124,11 @@
 </div>
 <!-- //Update Modal -->
 <!-- Details Modal -->
-<div class="modal fade" id="detailsCategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="detailsProject" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Details Category</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Details Project</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -150,10 +139,6 @@
                     <tr>
                         <th>Name</th>
                         <td id="dname"></td>
-                    </tr>
-                    <tr>
-                        <th>Project name</th>
-                        <td id="dProjectname"></td>
                     </tr>
                     <tr>
                         <th>Created By</th>
@@ -185,7 +170,7 @@
     //Update
     function EditData(id) {
         $.ajax({
-            url: '@Url.Action("Edit", "Categories")' + '/' + id,
+            url: '@Url.Action("Edit", "Projects")' + '/' + id,
             typr: "GET",
             contentType: "application/json;charset=UTF-8",
             dataType: "json",
@@ -194,11 +179,11 @@
                 $('#id').val(response.id);
                 $('#name').val(response.name);
 
-                $('#updateCategory').modal('show');
+                $('#updateProject').modal('show');
             },
             error: function (response) {
                 //alert(response.responseText);
-                $('#updateCategory').modal('show');
+                $('#updateProject').modal('show');
             }
         });
         return false;
@@ -207,7 +192,7 @@
     //Details
     function GetData(id) {
         $.ajax({
-            url: '@Url.Action("Details", "Categories")' + '/' + id,
+            url: '@Url.Action("Details", "Projects")' + '/' + id,
             typr: "GET",
             contentType: "application/json;charset=UTF-8",
             dataType: "json",
@@ -215,17 +200,16 @@
                 debugger;
 
                 $('#dname').text(response.name);
-                $('#dProjectname').text(response.projectName);
                 $('#dcreatedBy').text(response.createdBy);
                 $('#dcreated').text(response.created);
                 $('#dlastModifiedBy').text(response.lastModifiedBy);
                 $('#dlastModified').text(response.lastModified);
 
-                $('#detailsCategory').modal('show');
+                $('#detailsProject').modal('show');
             },
             error: function (response) {
                 //alert(response.responseText);
-                $('#detailsCategory').modal('show');
+                $('#detailsProject').modal('show');
             }
         });
         return false;

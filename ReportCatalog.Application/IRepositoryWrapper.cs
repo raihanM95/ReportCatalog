@@ -10,6 +10,7 @@ namespace ReportCatalog.Application
     {
         IUserRepository<User> Users { get; }
         IUserLogRepository<UserLog> UserLogs { get; }
+        IProjectRepository Projects { get; }
         ICategoryRepository Categories { get; }
         ISubCategoryRepository SubCategories { get; }
         IReportRepository Reports { get; }

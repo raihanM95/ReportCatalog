@@ -5,24 +5,23 @@ using ReportCatalog.Application.Interfaces;
 using ReportCatalog.Domain.Entities;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ReportCatalog.Infrastructure.Service.Repositories
 {
-    public class CategoryRepository : ICategoryRepository
+    public class ProjectRepository : IProjectRepository
     {
         private readonly IConfiguration _configuration;
-        public CategoryRepository(IConfiguration configuration)
+        public ProjectRepository(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
-        public async Task<int> AddAsync(Category entity)
+        public async Task<int> AddAsync(Project entity)
         {
-            var query = "INSERT INTO categories (name,projectId,createdBy,created) VALUES (@Name,@ProjectId,@CreatedBy,@Created)";
+            var query = "INSERT INTO projects (name,createdBy,created) VALUES (@Name,@CreatedBy,@Created)";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultDBConnection")))
             {
                 connection.Open();
@@ -34,7 +33,7 @@ namespace ReportCatalog.Infrastructure.Service.Repositories
 
         public async Task<int> DeleteAsync(int id)
         {
-            var query = "DELETE FROM categories WHERE id = @Id";
+            var query = "DELETE FROM projects WHERE id = @Id";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultDBConnection")))
             {
                 connection.Open();
@@ -44,63 +43,45 @@ namespace ReportCatalog.Infrastructure.Service.Repositories
             }
         }
 
-        public async Task<IReadOnlyList<Category>> GetAllAsync()
+        public async Task<IReadOnlyList<Project>> GetAllAsync()
         {
-            var query = @"SELECT cat.id, cat.name, cat.createdBy, cat.created, cat.lastModifiedBy, cat.lastModified, pro.id AS projectId, pro.name AS projectName
-                          FROM categories AS cat
-                          INNER JOIN projects AS pro
-                          ON cat.projectId = pro.id";
+            var query = "SELECT * FROM projects";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultDBConnection")))
             {
                 connection.Open();
-                var result = await connection.QueryAsync<Category>(query);
+                var result = await connection.QueryAsync<Project>(query);
                 connection.Close();
                 return result.ToList();
             }
         }
 
-        public async Task<IReadOnlyList<Category>> GetByProjectIdAsync(int id)
+        public async Task<Project> GetByIdAsync(int id)
         {
-            var query = "SELECT * FROM categories WHERE projectId = @Id";
+            var query = "SELECT * FROM projects WHERE id = @Id";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultDBConnection")))
             {
                 connection.Open();
-                var result = await connection.QueryAsync<Category>(query, new { Id = id });
-                connection.Close();
-                return result.ToList();
-            }
-        }
-
-        public async Task<Category> GetByIdAsync(int id)
-        {
-            var query = @"SELECT cat.id, cat.name, cat.createdBy, cat.created, cat.lastModifiedBy, cat.lastModified, pro.id AS projectId, pro.name AS projectName
-                          FROM categories AS cat
-                          INNER JOIN projects AS pro
-                          ON cat.projectId = pro.id WHERE cat.id = @Id";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultDBConnection")))
-            {
-                connection.Open();
-                var result = await connection.QuerySingleOrDefaultAsync<Category>(query, new { Id = id });
+                var result = await connection.QuerySingleOrDefaultAsync<Project>(query, new { Id = id });
                 connection.Close();
                 return result;
             }
         }
 
-        public async Task<Category> GetByNameAsync(string name)
+        public async Task<Project> GetByNameAsync(string name)
         {
-            var query = "SELECT * FROM categories WHERE name = @Name";
+            var query = "SELECT * FROM projects WHERE name = @Name";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultDBConnection")))
             {
                 connection.Open();
-                var result = await connection.QuerySingleOrDefaultAsync<Category>(query, new { Name = name });
+                var result = await connection.QuerySingleOrDefaultAsync<Project>(query, new { Name = name });
                 connection.Close();
                 return result;
             }
         }
 
-        public async Task<int> UpdateAsync(Category entity)
+        public async Task<int> UpdateAsync(Project entity)
         {
-            var query = "UPDATE categories SET name = @Name, lastModifiedBy = @LastModifiedBy, lastModified = @LastModified WHERE id = @Id";
+            var query = "UPDATE projects SET name = @Name, lastModifiedBy = @LastModifiedBy, lastModified = @LastModified WHERE id = @Id";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultDBConnection")))
             {
                 connection.Open();

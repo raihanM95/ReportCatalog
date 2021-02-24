@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ReportCatalog.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,5 +15,6 @@ namespace ReportCatalog.Web.Models
         public string Password { get; set; }
 
         public string UserType { get; set; }
+        public IEnumerable<User> Users { get; set; }
     }
 }

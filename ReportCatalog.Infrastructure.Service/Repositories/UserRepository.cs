@@ -19,6 +19,18 @@ namespace ReportCatalog.Infrastructure.Service.Repositories
             _configuration = configuration;
         }
 
+        public async Task<IReadOnlyList<User>> GetAllAsync()
+        {
+            var query = "SELECT * FROM users";
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultDBConnection")))
+            {
+                connection.Open();
+                var result = await connection.QueryAsync<User>(query);
+                connection.Close();
+                return result.ToList();
+            }
+        }
+
         public async Task<User> GetByNameAsync(string userName)
         {
             var query = "SELECT * FROM users WHERE username = @UserName";

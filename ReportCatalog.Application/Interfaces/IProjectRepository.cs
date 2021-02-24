@@ -2,12 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ReportCatalog.Application.Interfaces
 {
-    public interface ICategoryRepository : IRepositoryBase<Category>
+    public interface IProjectRepository : IRepositoryBase<Project>
     {
-        Task<IReadOnlyList<Category>> GetByProjectIdAsync(int id);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Encrypt.Pass;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,24 @@ namespace ReportCatalog.Web.Controllers
         public UsersController(IRepositoryWrapper repository)
         {
             _repository = repository;
+        }
+
+        // GET: Users/Users
+        public async Task<IActionResult> Users()
+        {
+            if (HttpContext.Session.GetString("Admin") != null)
+            {
+                var users = new UserViewModel
+                {
+                    Users = await _repository.Users.GetAllAsync()
+                };
+
+                return View(users);
+            }
+            else
+            {
+                return RedirectToAction("Index", "Users");
+            }
         }
 
         //GET: Users/Register
@@ -51,7 +70,7 @@ namespace ReportCatalog.Web.Controllers
                     var user = new User
                     {
                         Username = model.Username,
-                        Password = model.Password,
+                        Password = Crypto.Hash(model.Password),
                         UserType = "user",
                         CreatedBy = model.Username,
                         Created = DateTime.Now
@@ -95,7 +114,7 @@ namespace ReportCatalog.Web.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var user = await _repository.Users.GetUserAsync(model.Username, model.Password, "user");
+                    var user = await _repository.Users.GetUserAsync(model.Username, Crypto.Hash(model.Password), "user");
                     if (user == null)
                     {
                         ModelState.AddModelError("UserType", "Invalid login attempt!");
@@ -190,7 +209,7 @@ namespace ReportCatalog.Web.Controllers
                             UserType = "admin",
                             Time = DateTime.Now,
                             Type = "Login",
-                            IP = feature?.LocalIpAddress?.ToString()
+                            IP = feature?.RemoteIpAddress?.ToString()
                         };
 
                         await _repository.UserLogs.AddAsync(userLog);
@@ -214,7 +233,7 @@ namespace ReportCatalog.Web.Controllers
                 UserType = "admin",
                 Time = DateTime.Now,
                 Type = "Logout",
-                IP = feature?.LocalIpAddress?.ToString()
+                IP = feature?.RemoteIpAddress?.ToString()
             };
 
             await _repository.UserLogs.AddAsync(userLog);

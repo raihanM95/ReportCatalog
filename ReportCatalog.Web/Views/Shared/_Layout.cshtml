@@ -13,6 +13,11 @@
     
 </head>
 <body>
+    <style>
+        .btn-sm{
+            margin: 2px;
+        }
+    </style>
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Dashboard">Report Catalog</a>
         <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
@@ -56,9 +61,10 @@
                         </a>
                         <div class="collapse" id="setupReportCollapse" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" asp-area="" asp-controller="Categories" asp-action="Index">Report Category</a>
-                                <a class="nav-link" asp-area="" asp-controller="SubCategories" asp-action="Index">Sub-Report Category</a>
-                                <a class="nav-link" asp-area="" asp-controller="Reports" asp-action="Index">Reports</a>
+                                <a class="nav-link" asp-area="" asp-controller="Projects" asp-action="Index">Project</a>
+                                <a class="nav-link" asp-area="" asp-controller="Categories" asp-action="Index">Category</a>
+                                <a class="nav-link" asp-area="" asp-controller="SubCategories" asp-action="Index">Sub-Category</a>
+                                <a class="nav-link" asp-area="" asp-controller="Reports" asp-action="Index">Reports List</a>
                             </nav>
                         </div>
                         <div class="sb-sidenav-menu-heading">Interface</div>
@@ -69,6 +75,7 @@
                         </a>
                         <div class="collapse" id="interfaceUsersCollapse" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" asp-area="" asp-controller="Users" asp-action="Users">Users List</a>
                                 <a class="nav-link" asp-area="" asp-controller="UserLogs" asp-action="Index">Logs</a>
                                 
                             </nav>
