@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -25,20 +26,15 @@ namespace ReportCatalog.Web.Controllers
         }
 
         // GET: Reports/Reports
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> Reports()
         {
-            if (HttpContext.Session.GetString("User") != null)
-            {
-                ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Index", "Home");
-            }
+            ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
+            return View();
         }
 
         // GET: Reports/SubCategoryWiseReports
+        [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> SubCategoryWiseReports(int id)
         {
             var reports = await _repository.Reports.GetBySubCategoryIdAsync(id);
@@ -46,123 +42,91 @@ namespace ReportCatalog.Web.Controllers
         }
 
         // GET: Reports/View/5
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> View(int id)
         {
-            if (HttpContext.Session.GetString("User") != null)
+            if (id == 0)
             {
-                if (id == 0)
-                {
-                    return NotFound();
-                }
-
-                var report = await _repository.Reports.GetByIdAsync(id);
-                if (report == null)
-                {
-                    return NotFound();
-                }
-
-                return View(report);
+                return NotFound();
             }
-            else
+
+            var report = await _repository.Reports.GetByIdAsync(id);
+            if (report == null)
             {
-                return RedirectToAction("Login", "Users");
+                return NotFound();
             }
+
+            return View(report);
         }
 
         // GET: Reports
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            var reports = new ReportViewModel
             {
-                var reports = new ReportViewModel
-                {
-                    Reports = await _repository.Reports.GetAllAsync()
-                };
+                Reports = await _repository.Reports.GetAllAsync()
+            };
 
-                //ViewData["Category"] = new SelectList(await _repository.Categories.GetAllAsync(), "Id", "Name");
-
-                return View(reports);
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return View(reports);
         }
 
         // GET: Reports/Details/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int id)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            if (id == 0)
             {
-                if (id == 0)
-                {
-                    return NotFound();
-                }
-
-                var report = await _repository.Reports.GetByIdAsync(id);
-                if (report == null)
-                {
-                    return NotFound();
-                }
-
-                return View(report);
+                return NotFound();
             }
-            else
+
+            var report = await _repository.Reports.GetByIdAsync(id);
+            if (report == null)
             {
-                return RedirectToAction("Index", "Users");
+                return NotFound();
             }
+
+            return View(report);
         }
 
         // GET: Reports/Create
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
-            if (HttpContext.Session.GetString("Admin") != null)
-            {
-                ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
+            return View();
         }
 
         // POST: Reports/Create
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,FileName,Description,InputImage,OutputImage,SubCategoryId,Id")] ReportViewModel model)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            if (ModelState.IsValid && !ReportExists(model.Name))
             {
-                if (ModelState.IsValid && !ReportExists(model.Name))
+                var report = new Report
                 {
-                    var report = new Report
-                    {
-                        Name = model.Name,
-                        FileName = model.FileName,
-                        Description = model.Description,
-                        InputImage = InputImageUploadedFile(model),
-                        OutputImage = OutputImageUploadedFile(model),
-                        SubCategoryId = model.SubCategoryId,
-                        CreatedBy = HttpContext.Session.GetString("Admin"),
-                        Created = DateTime.Now
-                    };
+                    Name = model.Name,
+                    FileName = model.FileName,
+                    Description = model.Description,
+                    InputImage = InputImageUploadedFile(model),
+                    OutputImage = OutputImageUploadedFile(model),
+                    SubCategoryId = model.SubCategoryId,
+                    CreatedBy = HttpContext.Session.GetString("Admin"),
+                    Created = DateTime.Now
+                };
 
-                    ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
+                ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
 
-                    await _repository.Reports.AddAsync(report);
-                    return RedirectToAction(nameof(Index));
-                }
-
-                ModelState.AddModelError("Name", "Name already exists!");
-
-                //Thread.Sleep(10000);
-                return View();
+                await _repository.Reports.AddAsync(report);
+                return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+
+            ModelState.AddModelError("Name", "Name already exists!");
+
+            //Thread.Sleep(10000);
+            return View();
         }
 
         private bool ReportExists(int id)
@@ -184,18 +148,12 @@ namespace ReportCatalog.Web.Controllers
         }
 
         // POST: Reports/Delete/
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
-            {
-                var report = await _repository.Reports.DeleteAsync(id);
+            var report = await _repository.Reports.DeleteAsync(id);
 
-                return RedirectToAction(nameof(Index));
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return RedirectToAction(nameof(Index));
         }
 
         // Images upload

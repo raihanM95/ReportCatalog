@@ -30,6 +30,9 @@ namespace ReportCatalog.Web
 
             services.AddControllersWithViews();
 
+            //Cookie
+            services.ConfigureCookie();
+
             //Dependency Injection
             services.AddInfrastructure();
         }
@@ -49,6 +52,9 @@ namespace ReportCatalog.Web
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseCookiePolicy();
+            app.UseAuthentication();
 
             app.UseRouting();
 

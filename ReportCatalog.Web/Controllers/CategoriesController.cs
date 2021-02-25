@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace ReportCatalog.Web.Controllers
 {
-    //[Authorize]
     public class CategoriesController : Controller
     {
         private readonly IRepositoryWrapper _repository;
@@ -23,181 +22,140 @@ namespace ReportCatalog.Web.Controllers
         }
 
         // GET: Categories
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            var categories = new CategoryViewModel
             {
-                var categories = new CategoryViewModel
-                {
-                    Categories = await _repository.Categories.GetAllAsync()
-                };
+                Categories = await _repository.Categories.GetAllAsync()
+            };
 
-                ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
+            ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
 
-                return View(categories);
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return View(categories);
         }
 
         //GET: Categories/Details/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int id)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            if (id == 0)
             {
-                if (id == 0)
-                {
-                    return NotFound();
-                }
-
-                var category = await _repository.Categories.GetByIdAsync(id);
-                if (category == null)
-                {
-                    return NotFound();
-                }
-
-                return Json(category);
+                return NotFound();
             }
-            else
+
+            var category = await _repository.Categories.GetByIdAsync(id);
+            if (category == null)
             {
-                return RedirectToAction("Index", "Users");
+                return NotFound();
             }
+
+            return Json(category);
         }
 
         // GET: Categories/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            if (HttpContext.Session.GetString("Admin") != null)
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return View();
         }
 
         // POST: Categories/Create
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,ProjectId,Id")] CategoryViewModel model)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            if (ModelState.IsValid && !CategoryExists(model.Name))
             {
-                if (ModelState.IsValid && !CategoryExists(model.Name))
+                var category = new Category
                 {
-                    var category = new Category
-                    {
-                        Name = model.Name,
-                        ProjectId = model.ProjectId,
-                        CreatedBy = HttpContext.Session.GetString("Admin"),
-                        Created = DateTime.Now
-                    };
+                    Name = model.Name,
+                    ProjectId = model.ProjectId,
+                    CreatedBy = HttpContext.Session.GetString("Admin"),
+                    Created = DateTime.Now
+                };
 
-                    await _repository.Categories.AddAsync(category);
-                    return RedirectToAction(nameof(Index));
-                }
-
-                ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
-                ModelState.AddModelError("Name", "Name already exists!");
-
-                //Thread.Sleep(10000);
-                return View();
+                await _repository.Categories.AddAsync(category);
+                return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+
+            ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
+            ModelState.AddModelError("Name", "Name already exists!");
+
+            //Thread.Sleep(10000);
+            return View();
         }
 
         // GET: Categories/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            if (id == 0)
             {
-                if (id == 0)
-                {
-                    return NotFound();
-                }
+                return NotFound();
+            }
 
-                var category = await _repository.Categories.GetByIdAsync(id);
-                if (category == null)
-                {
-                    return NotFound();
-                }
-                //return View(category);
-                return Json(category);
-            }
-            else
+            var category = await _repository.Categories.GetByIdAsync(id);
+            if (category == null)
             {
-                return RedirectToAction("Index", "Users");
+                return NotFound();
             }
+            //return View(category);
+            return Json(category);
         }
 
         // POST: Categories/Edit/5
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Name,Id")] CategoryViewModel model)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            if (id != model.Id)
             {
-                if (id != model.Id)
-                {
-                    return NotFound();
-                }
+                return NotFound();
+            }
 
-                if (ModelState.IsValid)
+            if (ModelState.IsValid)
+            {
+                try
                 {
-                    try
+                    var category = new Category
                     {
-                        var category = new Category
-                        {
-                            Id = model.Id,
-                            Name = model.Name,
-                            LastModifiedBy = HttpContext.Session.GetString("Admin"),
-                            LastModified = DateTime.Now
-                        };
-                        await _repository.Categories.UpdateAsync(category);
-                    }
-                    catch (Exception ex)
+                        Id = model.Id,
+                        Name = model.Name,
+                        LastModifiedBy = HttpContext.Session.GetString("Admin"),
+                        LastModified = DateTime.Now
+                    };
+                    await _repository.Categories.UpdateAsync(category);
+                }
+                catch (Exception ex)
+                {
+                    if (!CategoryExists(model.Id))
                     {
-                        if (!CategoryExists(model.Id))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
+                        return NotFound();
                     }
-                    return RedirectToAction(nameof(Index));
+                    else
+                    {
+                        throw;
+                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: Categories/Delete/
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
-            {
-                var category = await _repository.Categories.DeleteAsync(id);
+            var category = await _repository.Categories.DeleteAsync(id);
 
-                return RedirectToAction(nameof(Index));
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Categories/Category
+        [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> Category(int id)
         {
             var categories = await _repository.Categories.GetByProjectIdAsync(id);

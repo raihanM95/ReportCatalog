@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ReportCatalog.Application;
 using ReportCatalog.Web.Models;
@@ -19,21 +20,15 @@ namespace ReportCatalog.Web.Controllers
         }
 
         // GET: UserLogs
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            var userLogs = new UserLogViewModel
             {
-                var userLogs = new UserLogViewModel
-                {
-                    UserLogs = await _repository.UserLogs.GetAllAsync()
-                };
+                UserLogs = await _repository.UserLogs.GetAllAsync()
+            };
 
-                return View(userLogs);
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return View(userLogs);
         }
     }
 }

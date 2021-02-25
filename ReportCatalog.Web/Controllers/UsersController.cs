@@ -1,4 +1,5 @@
 ﻿using Encrypt.Pass;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
@@ -10,6 +11,7 @@ using ReportCatalog.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ReportCatalog.Web.Controllers
@@ -24,24 +26,19 @@ namespace ReportCatalog.Web.Controllers
         }
 
         // GET: Users/Users
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Users()
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            var users = new UserViewModel
             {
-                var users = new UserViewModel
-                {
-                    Users = await _repository.Users.GetAllAsync()
-                };
+                Users = await _repository.Users.GetAllAsync()
+            };
 
-                return View(users);
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return View(users);
         }
 
         //GET: Users/Register
+        [AllowAnonymous]
         public IActionResult Register()
         {
             if (HttpContext.Session.GetString("User") != null)
@@ -56,6 +53,7 @@ namespace ReportCatalog.Web.Controllers
 
         // POST: Users/Register
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register([Bind("Username,Password")] UserViewModel model)
         {
@@ -89,6 +87,7 @@ namespace ReportCatalog.Web.Controllers
 
         //GET: Users/Login
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Login()
         {
             if (HttpContext.Session.GetString("User") != null)
@@ -103,6 +102,7 @@ namespace ReportCatalog.Web.Controllers
 
         // POST: Users/Login
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login([Bind("Username,Password")] UserViewModel model)
         {
@@ -136,7 +136,16 @@ namespace ReportCatalog.Web.Controllers
                         await _repository.UserLogs.AddAsync(userLog);
 
                         HttpContext.Session.SetString("User", user.Username);
-                        return RedirectToAction("Index", "Home");
+
+                        // Create the identity for the admin
+                        var identity = new ClaimsIdentity(new[] {
+                            new Claim(ClaimTypes.Name, model.Username),
+                            new Claim(ClaimTypes.Role, "User")
+                        }, "Grandma Identity");
+
+                        var principal = new ClaimsPrincipal(identity);
+                        var login = HttpContext.SignInAsync(principal);
+                        return RedirectToAction("Reports", "Reports");
                     }
                 }
                 return View();
@@ -144,9 +153,10 @@ namespace ReportCatalog.Web.Controllers
         }
 
         //POST: Users/Logout
+        [Authorize(Roles = "User")]
         public async Task<ActionResult> UserLogout()
         {
-            var ip = HttpContext.Connection.RemoteIpAddress.ToString();
+            //var ip = HttpContext.Connection.RemoteIpAddress.ToString();
             var feature = HttpContext.Features.Get<IHttpConnectionFeature>();
             // add userlog
             var userLog = new UserLog
@@ -155,11 +165,12 @@ namespace ReportCatalog.Web.Controllers
                 UserType = "user",
                 Time = DateTime.Now,
                 Type = "Logout",
-                IP = ip
+                IP = feature?.RemoteIpAddress?.ToString()
             };
 
             await _repository.UserLogs.AddAsync(userLog);
             HttpContext.Session.Remove("User");
+            var logout = HttpContext.SignOutAsync();
             return RedirectToAction("Login", "Users");
         }
 
@@ -182,6 +193,7 @@ namespace ReportCatalog.Web.Controllers
         // POST: Users
         [HttpPost]
         [Route("c/access")]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Index([Bind("Username,Password")] UserViewModel model)
         {
@@ -215,6 +227,15 @@ namespace ReportCatalog.Web.Controllers
                         await _repository.UserLogs.AddAsync(userLog);
 
                         HttpContext.Session.SetString("Admin", user.Username);
+
+                        // Create the identity for the admin
+                        var identity = new ClaimsIdentity(new[] {
+                            new Claim(ClaimTypes.Name, model.Username),
+                            new Claim(ClaimTypes.Role, "Admin")
+                        }, "Grandma Identity");
+
+                        var principal = new ClaimsPrincipal(identity);
+                        var login = HttpContext.SignInAsync(principal);
                         return RedirectToAction("Dashboard", "Home");
                     }
                 }
@@ -223,6 +244,7 @@ namespace ReportCatalog.Web.Controllers
         }
 
         //POST: Users/Logout
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Logout()
         {
             var feature = HttpContext.Features.Get<IHttpConnectionFeature>();
@@ -238,6 +260,7 @@ namespace ReportCatalog.Web.Controllers
 
             await _repository.UserLogs.AddAsync(userLog);
             HttpContext.Session.Remove("Admin");
+            var logout = HttpContext.SignOutAsync();
             return RedirectToAction("Index", "Users");
         }
 

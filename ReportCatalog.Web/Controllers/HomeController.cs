@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ReportCatalog.Application;
@@ -20,8 +21,10 @@ namespace ReportCatalog.Web.Controllers
             _logger = logger;
         }
 
+        // GET: Home
         public IActionResult Index()
         {
+
             if (HttpContext.Session.GetString("User") != null)
             {
                 return RedirectToAction("Reports", "Reports");
@@ -36,16 +39,11 @@ namespace ReportCatalog.Web.Controllers
             }
         }
 
+        // GET: Home/Dashboard
+        [Authorize(Roles = "Admin")]
         public IActionResult Dashboard()
         {
-            if (HttpContext.Session.GetString("Admin") != null)
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

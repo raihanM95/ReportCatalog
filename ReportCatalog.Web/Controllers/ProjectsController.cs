@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ReportCatalog.Application;
 using ReportCatalog.Domain.Entities;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace ReportCatalog.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ProjectsController : Controller
     {
         private readonly IRepositoryWrapper _repository;
@@ -22,56 +24,35 @@ namespace ReportCatalog.Web.Controllers
         // GET: Projects
         public async Task<IActionResult> Index()
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            var projects = new ProjectViewModel
             {
-                var projects = new ProjectViewModel
-                {
-                    Projects = await _repository.Projects.GetAllAsync()
-                };
+                Projects = await _repository.Projects.GetAllAsync()
+            };
 
-                return View(projects);
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return View(projects);
         }
 
         //GET: Projects/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            if (id == 0)
             {
-                if (id == 0)
-                {
-                    return NotFound();
-                }
-
-                var project = await _repository.Projects.GetByIdAsync(id);
-                if (project == null)
-                {
-                    return NotFound();
-                }
-
-                return Json(project);
+                return NotFound();
             }
-            else
+
+            var project = await _repository.Projects.GetByIdAsync(id);
+            if (project == null)
             {
-                return RedirectToAction("Index", "Users");
+                return NotFound();
             }
+
+            return Json(project);
         }
 
         // GET: Projects/Create
         public IActionResult Create()
         {
-            if (HttpContext.Session.GetString("Admin") != null)
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return View();
         }
 
         // POST: Projects/Create
@@ -79,54 +60,40 @@ namespace ReportCatalog.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Id")] ProjectViewModel model)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            if (ModelState.IsValid && !ProjectExists(model.Name))
             {
-                if (ModelState.IsValid && !ProjectExists(model.Name))
+                var project = new Project
                 {
-                    var project = new Project
-                    {
-                        Name = model.Name,
-                        CreatedBy = HttpContext.Session.GetString("Admin"),
-                        Created = DateTime.Now
-                    };
+                    Name = model.Name,
+                    CreatedBy = HttpContext.Session.GetString("Admin"),
+                    Created = DateTime.Now
+                };
 
-                    await _repository.Projects.AddAsync(project);
-                    return RedirectToAction(nameof(Index));
-                }
-
-                ModelState.AddModelError("Name", "Name already exists!");
-
-                //Thread.Sleep(10000);
-                return View();
+                await _repository.Projects.AddAsync(project);
+                return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+
+            ModelState.AddModelError("Name", "Name already exists!");
+
+            //Thread.Sleep(10000);
+            return View();
         }
 
         // GET: Projects/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            if (id == 0)
             {
-                if (id == 0)
-                {
-                    return NotFound();
-                }
+                return NotFound();
+            }
 
-                var project = await _repository.Projects.GetByIdAsync(id);
-                if (project == null)
-                {
-                    return NotFound();
-                }
-                
-                return Json(project);
-            }
-            else
+            var project = await _repository.Projects.GetByIdAsync(id);
+            if (project == null)
             {
-                return RedirectToAction("Index", "Users");
+                return NotFound();
             }
+
+            return Json(project);
         }
 
         // POST: Projects/Edit/5
@@ -134,60 +101,46 @@ namespace ReportCatalog.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Name,Id")] ProjectViewModel model)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            if (id != model.Id)
             {
-                if (id != model.Id)
-                {
-                    return NotFound();
-                }
+                return NotFound();
+            }
 
-                if (ModelState.IsValid)
+            if (ModelState.IsValid)
+            {
+                try
                 {
-                    try
+                    var project = new Project
                     {
-                        var project = new Project
-                        {
-                            Id = model.Id,
-                            Name = model.Name,
-                            LastModifiedBy = HttpContext.Session.GetString("Admin"),
-                            LastModified = DateTime.Now
-                        };
-                        await _repository.Projects.UpdateAsync(project);
-                    }
-                    catch (Exception ex)
+                        Id = model.Id,
+                        Name = model.Name,
+                        LastModifiedBy = HttpContext.Session.GetString("Admin"),
+                        LastModified = DateTime.Now
+                    };
+                    await _repository.Projects.UpdateAsync(project);
+                }
+                catch (Exception ex)
+                {
+                    if (!ProjectExists(model.Id))
                     {
-                        if (!ProjectExists(model.Id))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
+                        return NotFound();
                     }
-                    return RedirectToAction(nameof(Index));
+                    else
+                    {
+                        throw;
+                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: Projects/Delete/
         public async Task<IActionResult> Delete(int id)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
-            {
-                var category = await _repository.Projects.DeleteAsync(id);
+            var category = await _repository.Projects.DeleteAsync(id);
 
-                return RedirectToAction(nameof(Index));
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return RedirectToAction(nameof(Index));
         }
 
         private bool ProjectExists(int id)

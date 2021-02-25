@@ -35,5 +35,17 @@ namespace ReportCatalog.Web.Extensions
                 options.Cookie.IsEssential = true;
             });
         }
+
+        public static void ConfigureCookie(this IServiceCollection services)
+        {
+            services.AddAuthentication("CookieAuth")
+                .AddCookie("CookieAuth", config =>
+                {
+                    config.Cookie.Name = "Grandmas.Cookie";
+                    config.ExpireTimeSpan = TimeSpan.FromDays(1);
+                    config.LoginPath = "/Home/Index";
+                    config.AccessDeniedPath = "/Home/Index";
+                });
+        }
     }
 }

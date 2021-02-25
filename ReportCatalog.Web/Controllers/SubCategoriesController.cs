@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ReportCatalog.Application;
@@ -21,181 +22,140 @@ namespace ReportCatalog.Web.Controllers
         }
 
         // GET: SubCategories
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            var subCategories = new SubCategoryViewModel
             {
-                var subCategories = new SubCategoryViewModel
-                {
-                    SubCategories = await _repository.SubCategories.GetAllAsync()
-                };
+                SubCategories = await _repository.SubCategories.GetAllAsync()
+            };
 
-                ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
+            ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
 
-                return View(subCategories);
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return View(subCategories);
         }
 
         //GET: SubCategories/Details/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int id)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            if (id == 0)
             {
-                if (id == 0)
-                {
-                    return NotFound();
-                }
-
-                var subCategory = await _repository.SubCategories.GetByIdAsync(id);
-                if (subCategory == null)
-                {
-                    return NotFound();
-                }
-
-                return Json(subCategory);
+                return NotFound();
             }
-            else
+
+            var subCategory = await _repository.SubCategories.GetByIdAsync(id);
+            if (subCategory == null)
             {
-                return RedirectToAction("Index", "Users");
+                return NotFound();
             }
+
+            return Json(subCategory);
         }
 
         // GET: SubCategories/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            if (HttpContext.Session.GetString("Admin") != null)
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return View();
         }
 
         // POST: SubCategories/Create
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,CategoryId,Id")] SubCategoryViewModel model)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            if (ModelState.IsValid && !SubCategoryExists(model.Name))
             {
-                if (ModelState.IsValid && !SubCategoryExists(model.Name))
+                var subCategory = new SubCategory
                 {
-                    var subCategory = new SubCategory
-                    {
-                        Name = model.Name,
-                        CategoryId = model.CategoryId,
-                        CreatedBy = HttpContext.Session.GetString("Admin"),
-                        Created = DateTime.Now
-                    };
+                    Name = model.Name,
+                    CategoryId = model.CategoryId,
+                    CreatedBy = HttpContext.Session.GetString("Admin"),
+                    Created = DateTime.Now
+                };
 
-                    await _repository.SubCategories.AddAsync(subCategory);
-                    return RedirectToAction(nameof(Index));
-                }
-
-                ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
-                ModelState.AddModelError("Name", "Name already exists!");
-
-                //Thread.Sleep(10000);
-                return View();
+                await _repository.SubCategories.AddAsync(subCategory);
+                return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+
+            ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
+            ModelState.AddModelError("Name", "Name already exists!");
+
+            //Thread.Sleep(10000);
+            return View();
         }
 
         // GET: SubCategories/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            if (id == 0)
             {
-                if (id == 0)
-                {
-                    return NotFound();
-                }
+                return NotFound();
+            }
 
-                var subCategory = await _repository.SubCategories.GetByIdAsync(id);
-                if (subCategory == null)
-                {
-                    return NotFound();
-                }
-                //return View(subCategory);
-                return Json(subCategory);
-            }
-            else
+            var subCategory = await _repository.SubCategories.GetByIdAsync(id);
+            if (subCategory == null)
             {
-                return RedirectToAction("Index", "Users");
+                return NotFound();
             }
+            //return View(subCategory);
+            return Json(subCategory);
         }
 
         // POST: SubCategories/Edit/5
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Name,Id")] SubCategoryViewModel model)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            if (id != model.Id)
             {
-                if (id != model.Id)
-                {
-                    return NotFound();
-                }
+                return NotFound();
+            }
 
-                if (ModelState.IsValid)
+            if (ModelState.IsValid)
+            {
+                try
                 {
-                    try
+                    var subCategory = new SubCategory
                     {
-                        var subCategory = new SubCategory
-                        {
-                            Id = model.Id,
-                            Name = model.Name,
-                            LastModifiedBy = HttpContext.Session.GetString("Admin"),
-                            LastModified = DateTime.Now
-                        };
-                        await _repository.SubCategories.UpdateAsync(subCategory);
-                    }
-                    catch (Exception ex)
+                        Id = model.Id,
+                        Name = model.Name,
+                        LastModifiedBy = HttpContext.Session.GetString("Admin"),
+                        LastModified = DateTime.Now
+                    };
+                    await _repository.SubCategories.UpdateAsync(subCategory);
+                }
+                catch (Exception ex)
+                {
+                    if (!SubCategoryExists(model.Id))
                     {
-                        if (!SubCategoryExists(model.Id))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
+                        return NotFound();
                     }
-                    return RedirectToAction(nameof(Index));
+                    else
+                    {
+                        throw;
+                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: SubCategories/Delete/
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            if (HttpContext.Session.GetString("Admin") != null)
-            {
-                var subCategory = await _repository.SubCategories.DeleteAsync(id);
+            var subCategory = await _repository.SubCategories.DeleteAsync(id);
 
-                return RedirectToAction(nameof(Index));
-            }
-            else
-            {
-                return RedirectToAction("Index", "Users");
-            }
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: SubCategories/SubCategory
+        [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> SubCategory(int id)
         {
             var subCategories = await _repository.SubCategories.GetByCategoryIdAsync(id);
