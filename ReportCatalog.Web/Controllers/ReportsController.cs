@@ -93,7 +93,12 @@ namespace ReportCatalog.Web.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
-            ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
+            List<Project> projects = new List<Project>();
+
+            projects = (List<Project>)await _repository.Projects.GetAllAsync();
+            projects.Insert(0, new Project { Id = 0, Name = "Select" });
+
+            ViewData["Project"] = new SelectList(projects, "Id", "Name");
             return View();
         }
 
@@ -117,7 +122,12 @@ namespace ReportCatalog.Web.Controllers
                     Created = DateTime.Now
                 };
 
-                ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
+                List<Project> projects = new List<Project>();
+
+                projects = (List<Project>)await _repository.Projects.GetAllAsync();
+                projects.Insert(0, new Project { Id = 0, Name = "Select" });
+
+                ViewData["Project"] = new SelectList(projects, "Id", "Name");
 
                 await _repository.Reports.AddAsync(report);
                 return RedirectToAction(nameof(Index));
@@ -163,12 +173,13 @@ namespace ReportCatalog.Web.Controllers
 
             if (model.InputImage != null)
             {
-                //Save image to wwwroot/images
+                //Save image to wwwroot/images/input
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
                 string fileName = Path.GetFileNameWithoutExtension(model.InputImage.FileName);
                 string extension = Path.GetExtension(model.InputImage.FileName);
-                inputImagePath = fileName = "MSDSL" + "_" + fileName + DateTime.Now.ToString("yymmssfff") + extension;
-                string path = Path.Combine(wwwRootPath + "/images/", fileName);
+                //inputImagePath = fileName = "MSDSL" + "_" + fileName + DateTime.Now.ToString("yymmssfff") + extension;
+                inputImagePath = fileName = "MSDSL" + "_" + Guid.NewGuid().ToString() + DateTime.Now.ToString("yymmssfff") + extension;
+                string path = Path.Combine(wwwRootPath + "/images/input/", fileName);
                 using (var fileStream = new FileStream(path, FileMode.Create))
                 {
                     model.InputImage.CopyTo(fileStream);
@@ -191,15 +202,16 @@ namespace ReportCatalog.Web.Controllers
 
             if (model.OutputImage != null)
             {
-                //Save image to wwwroot/images
+                //Save image to wwwroot/images/output
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
                 string fileName = Path.GetFileNameWithoutExtension(model.OutputImage.FileName);
                 string extension = Path.GetExtension(model.OutputImage.FileName);
-                outputImagePath = fileName = "MSDSL" + "_" + fileName + DateTime.Now.ToString("yymmssfff") + extension;
-                string path = Path.Combine(wwwRootPath + "/images/", fileName);
+                //outputImagePath = fileName = "MSDSL" + "_" + fileName + DateTime.Now.ToString("yymmssfff") + extension;
+                outputImagePath = fileName = "MSDSL" + "_" + Guid.NewGuid().ToString() + DateTime.Now.ToString("yymmssfff") + extension;
+                string path = Path.Combine(wwwRootPath + "/images/output/", fileName);
                 using (var fileStream = new FileStream(path, FileMode.Create))
                 {
-                    model.InputImage.CopyTo(fileStream);
+                    model.OutputImage.CopyTo(fileStream);
                 }
             }
             return outputImagePath;

@@ -66,10 +66,10 @@
                                 @Html.DisplayFor(modelItem => item.SubCategoryName)
                             </td>
                             <td>
-                                <img onclick="GetId('in_'+@item.Id.ToString())" id="in_@item.Id" src="~/images/@Html.DisplayFor(modelItem => item.InputImage)" class="rounded-circle image" height="100" width="100" alt="Image Not Available" />
+                                <img onclick="GetId('in_'+@item.Id.ToString())" id="in_@item.Id" src="~/images/input/@Html.DisplayFor(modelItem => item.InputImage)" class="rounded-circle image" height="100" width="100" alt="Image Not Available" />
                             </td>
                             <td>
-                                <img onclick="GetId('out_'+@item.Id.ToString())" id="out_@item.Id" src="~/images/@Html.DisplayFor(modelItem => item.OutputImage)" class="rounded-circle image" height="100" width="100" alt="Image Not Available" />
+                                <img onclick="GetId('out_'+@item.Id.ToString())" id="out_@item.Id" src="~/images/output/@Html.DisplayFor(modelItem => item.OutputImage)" class="rounded-circle image" height="100" width="100" alt="Image Not Available" />
                             </td>
 
                             <td>

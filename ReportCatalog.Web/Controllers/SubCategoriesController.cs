@@ -30,7 +30,12 @@ namespace ReportCatalog.Web.Controllers
                 SubCategories = await _repository.SubCategories.GetAllAsync()
             };
 
-            ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
+            List<Project> projects = new List<Project>();
+
+            projects = (List<Project>)await _repository.Projects.GetAllAsync();
+            projects.Insert(0, new Project { Id = 0, Name = "Select" });
+
+            ViewData["Project"] = new SelectList(projects, "Id", "Name");
 
             return View(subCategories);
         }
@@ -80,7 +85,12 @@ namespace ReportCatalog.Web.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["Project"] = new SelectList(await _repository.Projects.GetAllAsync(), "Id", "Name");
+            List<Project> projects = new List<Project>();
+
+            projects = (List<Project>)await _repository.Projects.GetAllAsync();
+            projects.Insert(0, new Project { Id = 0, Name = "Select" });
+
+            ViewData["Project"] = new SelectList(projects, "Id", "Name");
             ModelState.AddModelError("Name", "Name already exists!");
 
             //Thread.Sleep(10000);

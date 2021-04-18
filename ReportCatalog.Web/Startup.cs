@@ -53,6 +53,7 @@ namespace ReportCatalog.Web
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            //Cookie
             app.UseCookiePolicy();
             app.UseAuthentication();
 

@@ -205,7 +205,7 @@ namespace ReportCatalog.Web.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var user = await _repository.Users.GetUserAsync(model.Username, model.Password, "admin");
+                    var user = await _repository.Users.GetUserAsync(model.Username, Crypto.Hash(model.Password), "admin");
                     if (user == null)
                     {
                         ModelState.AddModelError("Password", "Invalid login attempt!");
